@@ -53,4 +53,19 @@ export class MembersService {
         })
       );
   }
+
+  deletePhoto(photoId: number) {
+    return this.http
+      .delete(this.baseUrl + 'users/delete-photo/' + photoId)
+      .pipe(
+        tap(() => {
+          this.members.update((members) =>
+            members.map((m) => {
+              m.photos = m.photos.filter((p) => p.id !== photoId);
+              return m;
+            })
+          );
+        })
+      );
+  }
 }
