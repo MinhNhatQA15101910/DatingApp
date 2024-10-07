@@ -1,5 +1,3 @@
-using System.Net;
-using System.Text.Json;
 using API.Errors;
 
 namespace API.Middleware;
