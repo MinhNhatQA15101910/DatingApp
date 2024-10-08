@@ -16,7 +16,7 @@ public class LikesRepository(DataContext context, IMapper mapper) : ILikesReposi
         context.Likes.Remove(like);
     }
 
-    public async Task<IEnumerable<int>> GetCurrentUserLikeIds(string currentUserId)
+    public async Task<IEnumerable<int>> GetCurrentUserLikeIds(int currentUserId)
     {
         return await context.Likes
             .Where(x => x.SourceUserId == currentUserId)
