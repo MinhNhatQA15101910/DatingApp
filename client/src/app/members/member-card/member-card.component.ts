@@ -17,4 +17,18 @@ export class MemberCardComponent {
   hasLiked = computed(() =>
     this.likesService.likeIds().includes(this.member().id)
   );
+
+  toggleLike() {
+    this.likesService.toggleLike(this.member().id).subscribe({
+      next: () => {
+        if (this.hasLiked()) {
+          this.likesService.likeIds.update((ids) =>
+            ids.filter((id) => id !== this.member().id)
+          );
+        } else {
+          this.likesService.likeIds.update((ids) => [...ids, this.member().id]);
+        }
+      },
+    });
+  }
 }
