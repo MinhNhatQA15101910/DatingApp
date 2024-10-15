@@ -47,9 +47,32 @@ public class MessageRepository(DataContext context, IMapper mapper) : IMessageRe
         );
     }
 
-    public Task<IEnumerable<MessageDto>> GetMessageThreadAsync(string currentUsername, string recipientUsername)
+    public async Task<IEnumerable<MessageDto>> GetMessageThreadAsync(
+        string currentUsername,
+        string recipientUsername
+    )
     {
-        throw new NotImplementedException();
+        var messages = await context.Messages
+            .Include(u => u.Sender).ThenInclude(p => p.Photos)
+            .Include(u => u.Recipient).ThenInclude(p => p.Photos)
+            .Where(m =>
+                m.Recipient.UserName == currentUsername && m.Sender.UserName == recipientUsername ||
+                m.Recipient.UserName == recipientUsername && m.Sender.UserName == currentUsername
+            )
+            .OrderBy(m => m.MessageSent)
+            .ToListAsync();
+
+        var unreadMessages = messages.Where(m =>
+            m.DateRead == null &&
+            m.Recipient.UserName == currentUsername
+        ).ToList();
+        if (unreadMessages.Count != 0)
+        {
+            unreadMessages.ForEach(m => m.DateRead = DateTime.UtcNow);
+            await context.SaveChangesAsync();
+        }
+
+        return mapper.Map<IEnumerable<MessageDto>>(messages);
     }
 
     public async Task<bool> SaveAllAsync()
