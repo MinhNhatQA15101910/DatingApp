@@ -5,7 +5,7 @@ using API.Interfaces;
 
 namespace API.Data;
 
-public class MessageRepository(DataContext context) : IMessageRepository
+public class MessageRepository(DataContext context, IMapper mapper) : IMessageRepository
 {
     public void AddMessage(Message message)
     {
@@ -22,9 +22,29 @@ public class MessageRepository(DataContext context) : IMessageRepository
         return await context.Messages.FindAsync(id);
     }
 
-    public Task<PagedList<MessageDto>> GetMessagesForUserAsync()
+    public async Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessageParams messageParams)
     {
-        throw new NotImplementedException();
+        var query = context.Messages
+            .OrderByDescending(m => m.MessageSent)
+            .AsQueryable();
+
+        query = messageParams.Container switch
+        {
+            "Inbox" => query.Where(u => u.Recipient.UserName == messageParams.Username),
+            "Outbox" => query.Where(u => u.Sender.UserName == messageParams.Username),
+            _ => query.Where(
+                u => u.Recipient.UserName == messageParams.Username
+                && u.DateRead == null
+            )
+        };
+
+        var messages = query.ProjectTo<MessageDto>(mapper.ConfigurationProvider);
+
+        return await PagedList<MessageDto>.CreateAsync(
+            messages,
+            messageParams.PageNumber,
+            messageParams.PageSize
+        );
     }
 
     public Task<IEnumerable<MessageDto>> GetMessageThreadAsync(string currentUsername, string recipientUsername)
