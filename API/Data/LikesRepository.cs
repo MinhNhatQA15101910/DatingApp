@@ -17,7 +17,7 @@ public class LikesRepository(DataContext context, IMapper mapper) : ILikesReposi
         context.Likes.Remove(like);
     }
 
-    public async Task<IEnumerable<int>> GetCurrentUserLikeIds(int currentUserId)
+    public async Task<IEnumerable<int>> GetCurrentUserLikeIdsAsync(int currentUserId)
     {
         return await context.Likes
             .Where(x => x.SourceUserId == currentUserId)
@@ -25,12 +25,12 @@ public class LikesRepository(DataContext context, IMapper mapper) : ILikesReposi
             .ToListAsync();
     }
 
-    public async Task<UserLike?> GetUserLike(int sourceUserId, int targetUserId)
+    public async Task<UserLike?> GetUserLikeAsync(int sourceUserId, int targetUserId)
     {
         return await context.Likes.FindAsync(sourceUserId, targetUserId);
     }
 
-    public async Task<PagedList<MemberDto>> GetUserLikes(LikeParams likeParams)
+    public async Task<PagedList<MemberDto>> GetUserLikesAsync(LikeParams likeParams)
     {
         var likes = context.Likes.AsQueryable();
         IQueryable<MemberDto> query;
@@ -52,7 +52,7 @@ public class LikesRepository(DataContext context, IMapper mapper) : ILikesReposi
                 break;
 
             default:
-                var likeIds = await GetCurrentUserLikeIds(likeParams.UserId);
+                var likeIds = await GetCurrentUserLikeIdsAsync(likeParams.UserId);
 
                 query = likes
                     .Where(x => x.TargetUserId == likeParams.UserId && likeIds.Contains(x.SourceUserId))
@@ -64,7 +64,7 @@ public class LikesRepository(DataContext context, IMapper mapper) : ILikesReposi
         return await PagedList<MemberDto>.CreateAsync(query, likeParams.PageNumber, likeParams.PageSize);
     }
 
-    public async Task<bool> SaveChanges()
+    public async Task<bool> SaveChangesAsync()
     {
         return await context.SaveChangesAsync() > 0;
     }

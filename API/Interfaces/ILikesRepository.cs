@@ -8,8 +8,8 @@ public interface ILikesRepository
 {
     void AddLike(UserLike like);
     void DeleteLike(UserLike like);
-    Task<IEnumerable<int>> GetCurrentUserLikeIds(int currentUserId);
-    Task<UserLike?> GetUserLike(int sourceUserId, int targetUserId);
-    Task<PagedList<MemberDto>> GetUserLikes(LikeParams likeParams);
-    Task<bool> SaveChanges();
+    Task<IEnumerable<int>> GetCurrentUserLikeIdsAsync(int currentUserId);
+    Task<UserLike?> GetUserLikeAsync(int sourceUserId, int targetUserId);
+    Task<PagedList<MemberDto>> GetUserLikesAsync(LikeParams likeParams);
+    Task<bool> SaveChangesAsync();
 }
