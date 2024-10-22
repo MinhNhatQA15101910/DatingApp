@@ -1,12 +1,24 @@
+using API.Entities;
+
 namespace API.Controllers;
 
-public class AdminController : BaseApiController
+public class AdminController(UserManager<AppUser> userManager) : BaseApiController
 {
     [Authorize(Policy = "RequireAdminRole")]
     [HttpGet("users-with-roles")]
-    public ActionResult GetUsersWithRoles()
+    public async Task<ActionResult> GetUsersWithRoles()
     {
-        return Ok("Only admins can see this");
+        var users = await userManager.Users
+            .OrderBy(user => user.UserName)
+            .Select(user => new
+            {
+                user.Id,
+                Username = user.UserName,
+                Roles = user.UserRoles.Select(userRole => userRole.Role.Name).ToList()
+            })
+            .ToListAsync();
+
+        return Ok(users);
     }
 
     [Authorize(Policy = "ModeratePhotoRole")]
