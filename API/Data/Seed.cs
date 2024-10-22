@@ -23,8 +23,6 @@ public class Seed
         {
             using var hmac = new HMACSHA512();
 
-            user.UserName = user.UserName.ToLower();
-
             context.Users.Add(user);
         }
 
