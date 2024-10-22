@@ -1,5 +1,4 @@
-import { Component, inject, input, OnInit } from '@angular/core';
-import { MessagesService } from '../../_services/messages.service';
+import { Component, input } from '@angular/core';
 import { Message } from '../../_models/message';
 import { TimeagoModule } from 'ngx-timeago';
 
@@ -10,21 +9,7 @@ import { TimeagoModule } from 'ngx-timeago';
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.css',
 })
-export class MemberMessagesComponent implements OnInit {
-  private messagesService = inject(MessagesService);
-
+export class MemberMessagesComponent {
   username = input.required<string>();
-  messages: Message[] = [];
-
-  ngOnInit(): void {
-    this.loadMessages();
-  }
-
-  loadMessages() {
-    this.messagesService.getMessageThread(this.username()).subscribe({
-      next: (messages) => {
-        this.messages = messages;
-      },
-    });
-  }
+  messages = input.required<Message[]>();
 }
