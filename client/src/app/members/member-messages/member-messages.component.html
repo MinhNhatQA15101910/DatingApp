@@ -25,7 +25,7 @@
                 <span class="text-danger">(unread)</span>
                 } @if (message.dateRead && message.senderUsername !==
                 username()) {
-                <span class="text-danger">(read)</span>
+                <span class="text-success">(read {{message.dateRead | timeago}})</span>
                 }
               </small>
             </div>
@@ -39,15 +39,24 @@
   </div>
 
   <div class="card-footer">
-    <form>
+    <form #messageForm="ngForm" (ngSubmit)="sendMessage()">
       <div class="input-group">
         <input
+          name="messageContent"
+          required
+          [(ngModel)]="messageContent"
           type="text"
           class="form-control input-sm"
           placeholder="Send a private message"
         />
         <div class="input-group-append">
-          <button class="btn btn-primary" type="submit">Send</button>
+          <button
+            class="btn btn-primary"
+            type="submit"
+            [disabled]="!messageForm.valid"
+          >
+            Send
+          </button>
         </div>
       </div>
     </form>
