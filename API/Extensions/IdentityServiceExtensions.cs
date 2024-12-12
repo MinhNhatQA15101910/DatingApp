@@ -5,7 +5,10 @@ namespace API.Extensions;
 
 public static class IdentityServiceExtensions
 {
-    public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddIdentityServices(
+        this IServiceCollection services,
+        IConfiguration config
+    )
     {
         services.AddIdentityCore<AppUser>(opt =>
         {
@@ -25,6 +28,22 @@ public static class IdentityServiceExtensions
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey)),
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(path) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
