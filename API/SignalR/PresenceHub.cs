@@ -1,5 +1,3 @@
-
-
 using API.Extensions;
 
 namespace API.SignalR;
