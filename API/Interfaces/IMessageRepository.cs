@@ -11,7 +11,7 @@ public interface IMessageRepository
     void DeleteMessage(Message message);
     Task<Connection?> GetConnectionAsync(string connectionId);
     Task<Message?> GetMessageAsync(int id);
-    Task<Group?> GetMessageGroup(string groupName);
+    Task<Group?> GetMessageGroupAsync(string groupName);
     Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessageParams messageParams);
     Task<IEnumerable<MessageDto>> GetMessageThreadAsync(
         string currentUsername,
