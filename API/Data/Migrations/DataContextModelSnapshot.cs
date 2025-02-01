@@ -152,6 +152,35 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.ToTable("AspNetUserRoles", (string)null);
             });
 
+        modelBuilder.Entity("API.Entities.Connection", b =>
+            {
+                b.Property<string>("ConnectionId")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("GroupName")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Username")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("ConnectionId");
+
+                b.HasIndex("GroupName");
+
+                b.ToTable("Connections");
+            });
+
+        modelBuilder.Entity("API.Entities.Group", b =>
+            {
+                b.Property<string>("Name")
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Name");
+
+                b.ToTable("Groups");
+            });
+
         modelBuilder.Entity("API.Entities.Message", b =>
             {
                 b.Property<int>("Id")
@@ -341,6 +370,13 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Navigation("User");
             });
 
+        modelBuilder.Entity("API.Entities.Connection", b =>
+            {
+                b.HasOne("API.Entities.Group", null)
+                    .WithMany("Connections")
+                    .HasForeignKey("GroupName");
+            });
+
         modelBuilder.Entity("API.Entities.Message", b =>
             {
                 b.HasOne("API.Entities.AppUser", "Recipient")
@@ -444,6 +480,11 @@ partial class DataContextModelSnapshot : ModelSnapshot
                 b.Navigation("Photos");
 
                 b.Navigation("UserRoles");
+            });
+
+        modelBuilder.Entity("API.Entities.Group", b =>
+            {
+                b.Navigation("Connections");
             });
 #pragma warning restore 612, 618
     }
