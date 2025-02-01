@@ -10,7 +10,8 @@ namespace API.SignalR;
 public class MessageHub(
     IMessageRepository messageRepository,
     IUserRepository userRepository,
-    IMapper mapper
+    IMapper mapper,
+    IHubContext<PresenceHub> presenceHub
 ) : Hub
 {
     public override async Task OnConnectedAsync()
@@ -54,6 +55,21 @@ public class MessageHub(
         if (sender == null || recipient == null || sender.UserName == null || recipient.UserName == null)
         {
             throw new HubException("Cannot send message at this time");
+        }
+        else
+        {
+            var connections = await PresenceTracker.GetConnectionsForUser(recipient.UserName);
+            if (connections != null && connections?.Count != null)
+            {
+                await presenceHub.Clients.Clients(connections).SendAsync(
+                    "NewMessageReceived",
+                    new
+                    {
+                        username = sender.UserName,
+                        knownAs = sender.KnownAs
+                    }
+                );
+            }
         }
 
         var message = new Message

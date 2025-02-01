@@ -7,12 +7,15 @@ import {
 } from '@microsoft/signalr';
 import { ToastrService } from 'ngx-toastr';
 import { User } from '../_models/user';
+import { take } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PresenceService {
   private hubConnection?: HubConnection;
+  private router = inject(Router);
   private toastr = inject(ToastrService);
 
   hubsUrl = environment.hubsUrl;
@@ -38,6 +41,15 @@ export class PresenceService {
 
     this.hubConnection.on('GetOnlineUsers', (usernames) => {
       this.onlineUsers.set(usernames);
+    });
+
+    this.hubConnection.on('NewMessageReceived', ({ username, knownAs }) => {
+      this.toastr
+        .info(`${knownAs} has sent you a new message! Click me to see it`)
+        .onTap.pipe(take(1))
+        .subscribe(() =>
+          this.router.navigateByUrl(`/members/${username}?tab=Messages`)
+        );
     });
   }
 
