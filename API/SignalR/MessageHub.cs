@@ -60,21 +60,6 @@ public class MessageHub(
         {
             throw new HubException("Cannot send message at this time");
         }
-        else
-        {
-            var connections = await PresenceTracker.GetConnectionsForUser(recipient.UserName);
-            if (connections != null && connections?.Count != null)
-            {
-                await presenceHub.Clients.Clients(connections).SendAsync(
-                    "NewMessageReceived",
-                    new
-                    {
-                        username = sender.UserName,
-                        knownAs = sender.KnownAs
-                    }
-                );
-            }
-        }
 
         var message = new Message
         {
@@ -91,6 +76,21 @@ public class MessageHub(
         if (group != null && group.Connections.Any(x => x.Username == recipient.UserName))
         {
             message.DateRead = DateTime.UtcNow;
+        }
+        else
+        {
+            var connections = await PresenceTracker.GetConnectionsForUser(recipient.UserName);
+            if (connections != null && connections?.Count != null)
+            {
+                await presenceHub.Clients.Clients(connections).SendAsync(
+                    "NewMessageReceived",
+                    new
+                    {
+                        username = sender.UserName,
+                        knownAs = sender.KnownAs
+                    }
+                );
+            }
         }
 
         messageRepository.AddMessage(message);
@@ -129,7 +129,7 @@ public class MessageHub(
 
     private async Task<Group> RemoveFromMessageGroup()
     {
-        var group = await messageRepository.GetGroupForConnection(Context.ConnectionId);
+        var group = await messageRepository.GetGroupForConnectionAsync(Context.ConnectionId);
         var connection = group?.Connections.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
         if (connection != null && group != null)
         {

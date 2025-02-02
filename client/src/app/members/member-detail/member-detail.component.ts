@@ -77,7 +77,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     if (
       this.messagesService.hubConnection?.state ===
         HubConnectionState.Connected &&
-      this.activeTab?.heading === 'Messaging'
+      this.activeTab?.heading === 'Messages'
     ) {
       this.messagesService.hubConnection.stop().then(() => {
         this.messagesService.createHubConnection(user, this.member.username);

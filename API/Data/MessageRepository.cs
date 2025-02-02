@@ -27,7 +27,7 @@ public class MessageRepository(DataContext context, IMapper mapper) : IMessageRe
         return await context.Connections.FindAsync(connectionId);
     }
 
-    public async Task<Group?> GetGroupForConnection(string connectionId)
+    public async Task<Group?> GetGroupForConnectionAsync(string connectionId)
     {
         return await context.Groups
             .Include(x => x.Connections)
