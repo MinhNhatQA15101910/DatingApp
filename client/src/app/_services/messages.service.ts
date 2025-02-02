@@ -16,7 +16,7 @@ import { User } from '../_models/user';
 })
 export class MessagesService {
   private http = inject(HttpClient);
-  private hubConnection?: HubConnection;
+  hubConnection?: HubConnection;
 
   baseUrl = environment.apiUrl;
   hubsUrl = environment.hubsUrl;
