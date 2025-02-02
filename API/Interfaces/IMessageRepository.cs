@@ -10,6 +10,7 @@ public interface IMessageRepository
     void AddMessage(Message message);
     void DeleteMessage(Message message);
     Task<Connection?> GetConnectionAsync(string connectionId);
+    Task<Group?> GetGroupForConnection(string connectionId);
     Task<Message?> GetMessageAsync(int id);
     Task<Group?> GetMessageGroupAsync(string groupName);
     Task<PagedList<MessageDto>> GetMessagesForUserAsync(MessageParams messageParams);
