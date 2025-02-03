@@ -11,5 +11,4 @@ public interface ILikesRepository
     Task<IEnumerable<int>> GetCurrentUserLikeIdsAsync(int currentUserId);
     Task<UserLike?> GetUserLikeAsync(int sourceUserId, int targetUserId);
     Task<PagedList<MemberDto>> GetUserLikesAsync(LikeParams likeParams);
-    Task<bool> SaveChangesAsync();
 }

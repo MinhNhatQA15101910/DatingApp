@@ -19,5 +19,4 @@ public interface IMessageRepository
         string recipientUsername
     );
     void RemoveConnection(Connection connection);
-    Task<bool> SaveAllAsync();
 }

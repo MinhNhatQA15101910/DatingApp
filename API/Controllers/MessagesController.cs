@@ -8,8 +8,7 @@ namespace API.Controllers;
 
 [Authorize]
 public class MessagesController(
-    IMessageRepository messageRepository,
-    IUserRepository userRepository,
+    IUnitOfWork unitOfWork,
     IMapper mapper
 ) : BaseApiController
 {
@@ -23,8 +22,8 @@ public class MessagesController(
             return BadRequest("You cannot message yourself");
         }
 
-        var sender = await userRepository.GetUserByUsernameAsync(username);
-        var recipient = await userRepository.GetUserByUsernameAsync(
+        var sender = await unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+        var recipient = await unitOfWork.UserRepository.GetUserByUsernameAsync(
             createMessageDto.RecipientUsername
         );
 
@@ -42,9 +41,9 @@ public class MessagesController(
             Content = createMessageDto.Content
         };
 
-        messageRepository.AddMessage(message);
+        unitOfWork.MessageRepository.AddMessage(message);
 
-        if (await messageRepository.SaveAllAsync())
+        if (await unitOfWork.Complete())
         {
             return Ok(mapper.Map<MessageDto>(message));
         }
@@ -59,7 +58,7 @@ public class MessagesController(
     {
         messageParams.Username = User.GetUsername();
 
-        var messages = await messageRepository.GetMessagesForUserAsync(messageParams);
+        var messages = await unitOfWork.MessageRepository.GetMessagesForUserAsync(messageParams);
 
         Response.AddPaginationHeader(messages);
 
@@ -71,7 +70,7 @@ public class MessagesController(
     {
         var currentUsername = User.GetUsername();
 
-        return Ok(await messageRepository.GetMessageThreadAsync(currentUsername, username));
+        return Ok(await unitOfWork.MessageRepository.GetMessageThreadAsync(currentUsername, username));
     }
 
     [HttpDelete("{id:int}")]
@@ -79,7 +78,7 @@ public class MessagesController(
     {
         var username = User.GetUsername();
 
-        var message = await messageRepository.GetMessageAsync(id);
+        var message = await unitOfWork.MessageRepository.GetMessageAsync(id);
         if (message == null)
         {
             return BadRequest("Cannot delete this message");
@@ -95,10 +94,10 @@ public class MessagesController(
 
         if (message is { SenderDeleted: true, RecipientDeleted: true })
         {
-            messageRepository.DeleteMessage(message);
+            unitOfWork.MessageRepository.DeleteMessage(message);
         }
 
-        if (await messageRepository.SaveAllAsync()) return Ok();
+        if (await unitOfWork.Complete()) return Ok();
 
         return BadRequest("Problem deleting the message");
     }
